@@ -393,28 +393,30 @@ def multi_transcriptid_info(mtid):
                 st.dataframe(sorted_result)
 
             st.subheader("Protein and PPI data")
-            protein_matching_rows = protein_df[protein_df['Transcript id'].isin(mtid_list)]
-            result=pd.DataFrame()
-            for tid in mtid_list:    
+            result = pd.DataFrame()
+    
+            for tid in mtid_list:
+                protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
                 if not protein_matching_rows.empty:
-                    temp_result = protein_df[protein_df['Transcript id'] == tid]
-                    result = pd.concat([result, temp_result], ignore_index=True)
+                    result = pd.concat([result, protein_matching_rows], ignore_index=True)
                 else:
                     st.write(f"No match found for Transcript id: {tid} in protein data\n")
             if not result.empty:
                 sorted_result = result.sort_values(by="Transcript id")
                 st.dataframe(sorted_result)
                 for tid in mtid_list:
-                    protein_matching_rows=protein_df[protein_df['Transcript id']==tid]
+                    protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
                     if not protein_matching_rows.empty:
                         protein_transcript = protein_matching_rows['preferredName'].values[0]
                         st.write(f"Protein Transcript for {tid}: {protein_transcript}")
-    
+                        
                         network_link = get_string_network_link(protein_transcript)
                         st.write("Redirected Network URL -->", network_link)
                         st.write("\n")
                     else:
                         st.write(f"No match found for Transcript id: {tid} in protein data\n")
+            else:
+                st.write("No protein data found for any of the provided Transcript IDs.\n")
             
             #Orthologous analysis
             st.subheader("Orthologs data")
