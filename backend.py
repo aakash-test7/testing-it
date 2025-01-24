@@ -483,19 +483,20 @@ def multi_transcriptid_info(mtid):
                 st.dataframe(result)        
 
             st.subheader("\nCellular Localisation data")
-            cello_matching_row = cello_df[cello_df['Transcript id'].isin(mtid_list)]
-            result=pd.DataFrame()
+            result = pd.DataFrame()
             for tid in mtid_list:
-                if not cello_matching_row.empty:
-                    temp_result = cello_matching_row[cello_matching_row['Transcript id'] == tid]
+                temp_result = cello_df[cello_df['Transcript id'] == tid]
+                if not temp_result.empty:
                     if '#Combined:' in temp_result.columns:
                         temp_result = temp_result.drop(columns=['#Combined:'])
-                    result = pd.concat([result, cello_matching_row], ignore_index=True)
+                    result = pd.concat([result, temp_result], ignore_index=True)
                 else:
                     st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
             if not result.empty:
                 result = result.drop_duplicates(subset=['Transcript id'])
                 st.dataframe(result)
+            else:
+                st.write("No cellular localisation data found for any of the provided Transcript IDs.\n")
         
             st.subheader("\nSequences data")
             for tid in mtid_list:
