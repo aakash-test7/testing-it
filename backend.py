@@ -335,8 +335,10 @@ def multi_user_input_menu(mtid):
         multi_transcriptid_info(mtid)
         if "," in mtid:
                 mtid_list = mtid.split(",")
-        else:
+        elif " " in mtid:
                 mtid_list = mtid.split(" ")
+        else:
+                mtid_list= [mtid.strip()]
         mtid_list.sort()        
         st.subheader("Model Prediction")
         for tid in mtid_list:
