@@ -349,10 +349,7 @@ def multi_user_input_menu(mtid):
                 st.write(f"{tid} Expression Status : normal  ( no particular tissue/stage favoured ) 0 \n")
 
 def multi_transcriptid_info(mtid):
-    if "," in mtid:
-            mtid_list = mtid.split(",")
-    else:
-            mtid_list= [mtid.strip()]
+    mtid_list = [tid.strip() for tid in mtid.replace(",", " ").split()]
     mtid_list.sort()
     if 'Transcript id' in df.columns and 'lncRNA' in df.columns:
         matching_rows = df[df['Transcript id'].isin(mtid_list)]
