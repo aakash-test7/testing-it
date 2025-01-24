@@ -351,8 +351,6 @@ def multi_user_input_menu(mtid):
 def multi_transcriptid_info(mtid):
     if "," in mtid:
             mtid_list = mtid.split(",")
-    elif " " in mtid:
-            mtid_list = mtid.split(" ")
     else:
             mtid_list= [mtid.strip()]
     mtid_list.sort()
@@ -371,17 +369,25 @@ def multi_transcriptid_info(mtid):
 
             st.subheader("RNA data")
             for tid in mtid_list:
-                if pd.notna(matching_rows['mRNA'].values[0]):
-                    st.write(f"{tid} mRNA present : Yes ( 1 )\n")
+                matching_row = df[df['Transcript id'] == tid]
+                if not matching_row.empty:
+                    if pd.notna(matching_row['mRNA'].values[0]):
+                        st.write(f"{tid} mRNA present : Yes ( 1 )\n")
+                    else:
+                        st.write(f"{tid} mRNA absent : No ( 0 )\n")
                 else:
-                    st.write(f"{tid} mRNA absent : No ( 0 )\n")
-
+                    st.write(f"No match found for Transcript id: {tid} in RNA data\n")
+            
             st.subheader("lncRNA data")
             for tid in mtid_list:
-                if pd.notna(matching_rows['lncRNA'].values[0]):
-                    st.write(f"{tid} lncRNAs present : Yes ( 1 )")
+                matching_row = df[df['Transcript id'] == tid]
+                if not matching_row.empty:
+                    if pd.notna(matching_row['lncRNA'].values[0]):
+                        st.write(f"{tid} lncRNAs present : Yes ( 1 )\n")
+                    else:
+                        st.write(f"{tid} lncRNAs absent : No ( 0 )\n")
                 else:
-                    st.write(f"{tid} lncRNAs absent : No ( 0 )\n")
+                    st.write(f"No match found for Transcript id: {tid} in lncRNA data\n")
 
             st.subheader("miRNA data")
             miRNA_matching_rows = miRNA_df[miRNA_df['Target_Acc.'].isin(mtid_list)]
