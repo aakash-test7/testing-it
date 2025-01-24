@@ -351,8 +351,10 @@ def multi_user_input_menu(mtid):
 def multi_transcriptid_info(mtid):
     if "," in mtid:
             mtid_list = mtid.split(",")
-    else:
+    elif " " in mtid:
             mtid_list = mtid.split(" ")
+    else:
+            mtid_list= [mtid.strip()]
     mtid_list.sort()
     if 'Transcript id' in df.columns and 'lncRNA' in df.columns:
         matching_rows = df[df['Transcript id'].isin(mtid_list)]
