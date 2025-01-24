@@ -405,8 +405,8 @@ def multi_transcriptid_info(mtid):
                 sorted_result = result.sort_values(by="Transcript id")
                 st.dataframe(sorted_result)
             for tid in mtid_list:
+                protein_matching_rows=protein_df[protein_df['Transcript id']==tid]
                 if not protein_matching_rows.empty:
-                    protein_matching_rows=protein_df[protein_df['Transcript id']==tid]
                     protein_transcript = protein_matching_rows['preferredName'].values[0]
                     st.write(f"Protein Transcript for {tid}: {protein_transcript}")
 
