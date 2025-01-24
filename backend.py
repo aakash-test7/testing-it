@@ -485,7 +485,7 @@ def multi_transcriptid_info(mtid):
             st.subheader("\nCellular Localisation data")
             cello_matching_row = cello_df[cello_df['Transcript id'].isin(mtid_list)]
             result=pd.DataFrame()
-            for tid in mtid:
+            for tid in mtid_list:
                 if not cello_matching_row.empty:
                     temp_result = cello_matching_row[cello_matching_row['Transcript id'] == tid]
                     if '#Combined:' in temp_result.columns:
