@@ -86,52 +86,46 @@ elif selected_page == "Meta Data":
     st.title("Meta Data")
     st.write("**Key Insights and Analytics from the Application Backend**")
     col1, col2 = st.columns([1, 2])
-
     with col1:
-        image_url = generate_signed_url("Images/1.png")
-        if image_url:
-            st.image(image_url, caption="Expression Data Heatmap", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
+        st.image(generate_signed_url("Images/1.png"), caption="Expression Data Heatmap", use_container_width=True)
         st.write("")
-        image_url = generate_signed_url("Images/2.png")
-        if image_url:
-            st.image(image_url, caption="SVM Kernel performance", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
+
+        st.image(generate_signed_url("Images/2.png"), caption="SVM Kernel Performance", use_container_width=True)
         st.write("")
+
+        st.image(generate_signed_url("Images/7.png"), caption="Tissue Specific Distribution Plots", use_container_width=True)
         st.write("")
-        image_url = generate_signed_url("Images/7.png")
-        if image_url:
-            st.image(image_url, caption="Tissue Specific Distribution plots", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
-        st.write("")
-        st.write("")
-        image_url = generate_signed_url("Images/5.png")
-        if image_url:
-            st.image(image_url, caption="WGCNA heatmaps", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
 
     with col2:
-        image_url = generate_signed_url("Images/4.png")
-        if image_url:
-            st.image(image_url, caption="Functional Annotation [Root Tissues]", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
+        st.image(generate_signed_url("Images/4.png"), caption="Functional Annotation [Root Tissues]", use_container_width=True)
         st.write("")
-        image_url = generate_signed_url("Images/6.png")
-        if image_url:
-            st.image(image_url, caption="Comaprison of lncRNAs, TF and Non-TF", use_container_width=True)
-        else:
-            st.warning("Image not found or unable to generate URL.")
-    image_url = generate_signed_url("Images/3.png")
-    if image_url:
-        st.image(image_url, caption="Performance charts for all files", use_container_width=True)
-    else:
-        st.warning("Image not found or unable to generate URL.")
 
+    col3, col4 = st.columns(2)
+    with col3:
+        st.image(generate_signed_url("Images/11.png"), caption="Functional Annotation [Seed Tissues]", use_container_width=True)
+        st.write("")
+
+    with col4:
+        st.image(generate_signed_url("Images/5.png"), caption="WGCNA Heatmaps", use_container_width=True)
+        st.write("")
+
+    st.image(generate_signed_url("Images/3.png"), caption="Performance Charts for All Files", use_container_width=True)
+
+    col5, col6 = st.columns(2)
+    with col5:
+        st.image(generate_signed_url("Images/8.png"), caption="Functional Annotation [Flower Development Stages]", use_container_width=True)
+        st.write("")
+
+        st.image(generate_signed_url("Images/9.png"), caption="Functional Annotation [Flower Parts]", use_container_width=True)
+        st.write("")
+
+    with col6:
+        st.image(generate_signed_url("Images/10.png"), caption="Functional Annotation [Green Tissues]", use_container_width=True)
+        st.write("")
+
+        st.image(generate_signed_url("Images/6.png"), caption="Comparison of lncRNAs, TF, and Non-TF", use_container_width=True)
+        st.write("")
+        
 # --- Glossary Page ---
 elif selected_page == "Glossary":
     st.title("Glossary")
@@ -221,9 +215,9 @@ elif selected_page == "About":
 
     import urllib.parse
     with st.popover('Contact Us'):
-        email_to = "akharbrtk2@gmaill.com"
+        email_to = "gopalkalwan56@gmaill.com"
         subject = "MultiClassClassificationInput App Inquiry"
-        body = "Hello, I would like to contact you regarding..."
+        body = "I am writing to inquire about..."
         subject_encoded = urllib.parse.quote(subject)
         body_encoded = urllib.parse.quote(body)
         # Create the mailto link
