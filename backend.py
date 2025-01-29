@@ -193,11 +193,91 @@ def transcriptid_info(tid):
         matching_row = df[df['Transcript id'] == tid]
 
         if not matching_row.empty:
+            st.subheader("Sequence data")
+            cds_code = format_sequence(matching_row['Cds Sequence'].values[0])
+            peptide_code = format_sequence(matching_row['Peptide Sequence'].values[0])
+            transcript_code = format_sequence(matching_row['Transcript Sequence'].values[0])
+            gene_code = format_sequence(matching_row['Genomic Sequence'].values[0])
+            promote_code = format_sequence(matching_row['Promoter Sequence'].values[0])
+
+            # Display as code block with copy functionality
+            with st.expander("Genomic Sequence"):
+                st.code(gene_code, language="text")
+            with st.expander("Transcript Sequence"):
+                st.code(transcript_code, language="text")
+            with st.expander("CDS Sequence"):
+                st.code(cds_code, language="text")
+            with st.expander("Peptide Sequence"):
+                st.code(peptide_code, language="text")
+            with st.expander("Promoter Sequence"):
+                st.code(promote_code, language="text")
+
+            header = f">{tid}|{tid}"
+            promote_file = f"{header}\n{promote_code}\n"
+            b64 = base64.b64encode(promote_file.encode()).decode()  # Convert to base64
+            href = f'<a href="data:text/plain;base64,{b64}" download="{tid}_promoter_sequence.txt">Download Promoter Sequence as .txt</a>'
+            st.markdown(href, unsafe_allow_html=True)
+            #st.download_button( label="Download Promoter Sequence as .txt", data=promote_file, file_name=f"{tid}_promoter_sequence.txt", mime="text/plain" )
+            st.write("Paste the promoter sequence on the following link to get promoter region analysis!")
+            st.write("https://bioinformatics.psb.ugent.be/webtools/plantcare/html/search_CARE_onCluster.html\n")
+
+            st.subheader("Protein and PPI data")
+            protein_matching_row = protein_df[protein_df['Transcript id'] == tid]
+            if not protein_matching_row.empty:
+                st.dataframe(protein_matching_row)
+                st.write("\n")
+                protein_transcript = protein_matching_row['preferredName'].values[0]
+                st.write(f"Protein Transcript for {tid}: {protein_transcript}")
+
+                network_link = get_string_network_link(protein_transcript)
+                st.write("Redirected Network URL -->", network_link)
+                st.write("\n")
+            else:
+                st.write(f"No match found for Transcript id: {tid} in protein data\n")
+            
+            st.subheader("Cellular Localisation data")
+            cello_matching_row = cello_df[cello_df['Transcript id'] == tid]
+            if not cello_matching_row.empty:
+                cello_matching_row = cello_matching_row.head(1)
+                cello_matching_row = cello_matching_row.drop(columns=["#Combined:"])
+                st.dataframe(cello_matching_row)
+                st.write("\n")
+            else:
+                st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
+
+            st.subheader("GO and KEGG data")
+            GO_matching_row = GO_df[GO_df['Transcript id'] == tid]
+            if not GO_matching_row.empty:
+                st.dataframe(GO_matching_row)
+                st.write("\n")
+            else:
+                st.write(f"No match found for Transcript id: {tid} in GO KEGG data\n")
+
             temp_df = df.copy()
             st.subheader("FPKM Matrix Atlas data")
             result = temp_df[temp_df['Transcript id'] == tid]
             result = result.drop(columns=['Genomic Coordinates', 'mRNA', 'lncRNA','Genomic Sequence','Transcript Sequence','Peptide Sequence','Cds Sequence','Promoter Sequence'])
             st.dataframe(result)
+
+            st.subheader("SNP Calling data")
+            st.write("Result data for both Cultivated and Wild varieties will be downloaded in the form of HTML content. Click on the files to view data\n")
+            try:
+                con1,con2=st.columns(2)
+                # Cultivated SNP Download Button
+                with con1:
+                    html_Cultivated_page_source = automate_Cultivated_task(tid)
+                    b64_html = base64.b64encode(html_Cultivated_page_source.encode()).decode()  # Convert to base64
+                    html_href = f'<a href="data:text/html;base64,{b64_html}" download="{tid}_Cultivated_SNP.html">Download Cultivated SNP as .html</a>'
+                    st.markdown(html_href, unsafe_allow_html=True)
+                # Wild SNP Download Button
+                with con2:
+                    html_wild_page_source = automate_Wild_task(tid)
+                    b64_html2 = base64.b64encode(html_wild_page_source.encode()).decode()  # Convert to base64
+                    html_href2 = f'<a href="data:text/html;base64,{b64_html2}" download="{tid}_Wild_SNP.html">Download Wild SNP as .html</a>'
+                    st.markdown(html_href2, unsafe_allow_html=True)
+            except Exception as e:
+                st.write("Error ! Error ! Error !")
+                st.write("Unable to fetch data from the server. Please try again later -->","https://cegresources.icrisat.org/cicerseq/?page_id=3605\n")
 
             st.subheader("RNA data")
             if pd.notna(matching_row['mRNA'].values[0]):
@@ -219,20 +299,6 @@ def transcriptid_info(tid):
             else:
                 st.write(f"No match found for Transcript id: {tid} in miRNA data\n")
 
-            st.subheader("Protein and PPI data")
-            protein_matching_row = protein_df[protein_df['Transcript id'] == tid]
-            if not protein_matching_row.empty:
-                st.dataframe(protein_matching_row)
-                st.write("\n")
-                protein_transcript = protein_matching_row['preferredName'].values[0]
-                st.write(f"Protein Transcript for {tid}: {protein_transcript}")
-
-                network_link = get_string_network_link(protein_transcript)
-                st.write("Redirected Network URL -->", network_link)
-                st.write("\n")
-            else:
-                st.write(f"No match found for Transcript id: {tid} in protein data\n")
-
             #Orthologous analysis
             st.subheader("Orthologs data")
             ortho_df = filter_orthologs(tid)
@@ -249,72 +315,7 @@ def transcriptid_info(tid):
             else:
                 st.write(f"No match found for Transcript id: {tid} in Inparalogs data\n")
             st.write("For detailed results visit the following link -->","https://orthovenn3.bioinfotoolkits.net/result/88e9a64330ba4d64b78fc5fd9561cd64/orthologous\n")
-
-            st.subheader("SNP Calling data")
-            st.write("Result data for both Cultivated and Wild varieties will be downloaded in the form of HTML content. Click on the files to view data\n")
-            try:
-                con1,con2=st.columns(2)
-                # Cultivated SNP Download Button
-                with con1:
-                    html_Cultivated_page_source = automate_Cultivated_task(tid)
-                    b64_html = base64.b64encode(html_Cultivated_page_source.encode()).decode()  # Convert to base64
-                    html_href = f'<a href="data:text/html;base64,{b64_html}" download="{tid}_Cultivated_SNP.html">Download Cultivated SNP as .html</a>'
-                    st.markdown(html_href, unsafe_allow_html=True)
-                # Wild SNP Download Button
-                with con2:
-                    html_wild_page_source = automate_Wild_task(tid)
-                    b64_html2 = base64.b64encode(html_wild_page_source.encode()).decode()  # Convert to base64
-                    html_href2 = f'<a href="data:text/html;base64,{b64_html2}" download="{tid}_Wild_SNP.html">Download Wild SNP as .html</a>'
-                    st.markdown(html_href2, unsafe_allow_html=True)
-            except Exception as e:
-                st.write("Error ! Error ! Error !")
-                st.write("Unable to fetch data from the server. Please try again later -->","https://cegresources.icrisat.org/cicerseq/?page_id=3605\n")
-            st.subheader("GO and KEGG data")
-            GO_matching_row = GO_df[GO_df['Transcript id'] == tid]
-            if not GO_matching_row.empty:
-                st.dataframe(GO_matching_row)
-                st.write("\n")
-            else:
-                st.write(f"No match found for Transcript id: {tid} in GO KEGG data\n")
-
-            st.subheader("Cellular Localisation data")
-            cello_matching_row = cello_df[cello_df['Transcript id'] == tid]
-            if not cello_matching_row.empty:
-                cello_matching_row = cello_matching_row.head(1)
-                cello_matching_row = cello_matching_row.drop(columns=["#Combined:"])
-                st.dataframe(cello_matching_row)
-                st.write("\n")
-            else:
-                st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
-
-            st.subheader("Sequences data")
-            cds_code = format_sequence(matching_row['Cds Sequence'].values[0])
-            peptide_code = format_sequence(matching_row['Peptide Sequence'].values[0])
-            transcript_code = format_sequence(matching_row['Transcript Sequence'].values[0])
-            gene_code = format_sequence(matching_row['Genomic Sequence'].values[0])
-            promote_code = format_sequence(matching_row['Promoter Sequence'].values[0])
-
-            # Display as code block with copy functionality
-            with st.expander("CDS Sequence"):
-                st.code(cds_code, language="text")
-            with st.expander("Peptide Sequence"):
-                st.code(peptide_code, language="text")
-            with st.expander("Transcript Sequence"):
-                st.code(transcript_code, language="text")
-            with st.expander("Genomic Sequence"):
-                st.code(gene_code, language="text")
-            with st.expander("Promoter Sequence"):
-                st.code(promote_code, language="text")
-
-            header = f">{tid}|{tid}"
-            promote_file = f"{header}\n{promote_code}\n"
-            b64 = base64.b64encode(promote_file.encode()).decode()  # Convert to base64
-            href = f'<a href="data:text/plain;base64,{b64}" download="{tid}_promoter_sequence.txt">Download Promoter Sequence as .txt</a>'
-            st.markdown(href, unsafe_allow_html=True)
-            #st.download_button( label="Download Promoter Sequence as .txt", data=promote_file, file_name=f"{tid}_promoter_sequence.txt", mime="text/plain" )
-            st.write("Paste the promoter sequence on the following link to get promoter region analysis!")
-            st.write("https://bioinformatics.psb.ugent.be/webtools/plantcare/html/search_CARE_onCluster.html\n")
-
+            
         else:
             st.write("Transcript ID not found\n")
     else:
@@ -354,6 +355,98 @@ def multi_transcriptid_info(mtid):
     if 'Transcript id' in df.columns and 'lncRNA' in df.columns:
         matching_rows = df[df['Transcript id'].isin(mtid_list)]
         if not matching_rows.empty:
+            st.subheader("\nSequences data")
+            for tid in mtid_list:
+                matching_rows = df[df['Transcript id'] == tid]
+                if not matching_rows.empty:
+                    cds_code = format_sequence(matching_rows['Cds Sequence'].values[0])
+                    peptide_code = format_sequence(matching_rows['Peptide Sequence'].values[0])
+                    transcript_code = format_sequence(matching_rows['Transcript Sequence'].values[0])
+                    gene_code = format_sequence(matching_rows['Genomic Sequence'].values[0])
+                    promote_code = format_sequence(matching_rows['Promoter Sequence'].values[0])
+
+                    with st.expander(f"{tid} Genomic Sequence"):
+                        st.code(gene_code, language="text")
+                    with st.expander(f"{tid} Transcript Sequence"):
+                        st.code(transcript_code, language="text")
+                    with st.expander(f"{tid} CDS Sequence"):
+                        st.code(cds_code, language="text")
+                    with st.expander(f"{tid} Peptide Sequence"):
+                        st.code(peptide_code, language="text")
+                    with st.expander(f"{tid} Promoter Sequence"):
+                        st.code(promote_code, language="text")
+
+                    header = f">{tid}|{tid}"
+                    promote_file = f"{header}\n{promote_code}\n"
+                    
+                    # Convert to base64 for download
+                    b64 = base64.b64encode(promote_file.encode()).decode()  # Convert to base64
+                    href = f'<a href="data:text/plain;base64,{b64}" download="{tid}_promoter_sequence.txt">Download Promoter Sequence as .txt</a>'
+                    st.markdown(href, unsafe_allow_html=True)
+
+                    # Provide link for further analysis
+                    st.write(f"Paste the promoter sequence for {tid} on the following link to get promoter region analysis!")
+                    st.write("https://bioinformatics.psb.ugent.be/webtools/plantcare/html/search_CARE_onCluster.html\n")
+                    st.write("\n")
+                else:
+                    st.write(f"No matching data found for Transcript ID: {tid}\n")
+
+            st.subheader("Protein and PPI data")
+            result = pd.DataFrame()
+    
+            for tid in mtid_list:
+                protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
+                if not protein_matching_rows.empty:
+                    result = pd.concat([result, protein_matching_rows], ignore_index=True)
+                else:
+                    st.write(f"No match found for Transcript id: {tid} in protein data\n")
+            if not result.empty:
+                sorted_result = result.sort_values(by="Transcript id")
+                st.dataframe(sorted_result)
+                for tid in mtid_list:
+                    protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
+                    if not protein_matching_rows.empty:
+                        protein_transcript = protein_matching_rows['preferredName'].values[0]
+                        st.write(f"Protein Transcript for {tid}: {protein_transcript}")
+                        
+                        network_link = get_string_network_link(protein_transcript)
+                        st.write("Redirected Network URL -->", network_link)
+                        st.write("\n")
+                    else:
+                        st.write(f"No match found for Transcript id: {tid} in protein data\n")
+            else:
+                st.write("No protein data found for any of the provided Transcript IDs.\n")
+
+            st.subheader("\nCellular Localisation data")
+            result = pd.DataFrame()
+            for tid in mtid_list:
+                temp_result = cello_df[cello_df['Transcript id'] == tid]
+                if not temp_result.empty:
+                    if '#Combined:' in temp_result.columns:
+                        temp_result = temp_result.drop(columns=['#Combined:'])
+                    result = pd.concat([result, temp_result], ignore_index=True)
+                else:
+                    st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
+            if not result.empty:
+                result = result.drop_duplicates(subset=['Transcript id'])
+                st.dataframe(result)
+            else:
+                st.write("No cellular localisation data found for any of the provided Transcript IDs.\n")
+
+            # Gene Ontology and KEGG data
+            st.subheader("\nGO and KEGG data")
+            GO_matching_row = GO_df[GO_df['Transcript id'].isin(mtid_list)]
+            result=pd.DataFrame()
+            for tid in mtid_list:
+                if not GO_matching_row.empty:
+                    temp_result = GO_matching_row[GO_matching_row['Transcript id'] == tid]
+                    result = pd.concat([result, temp_result], ignore_index=True)
+                else:
+                    st.write(f"No match found for Transcript ID: {tid} in GO KEGG data\n")
+            if not result.empty:
+                result = result.drop_duplicates(subset=['Transcript id'])
+                st.dataframe(result)        
+
             result=pd.DataFrame()
             temp_df = df.copy()
             st.subheader("FPKM Matrix Atlas data")
@@ -363,6 +456,30 @@ def multi_transcriptid_info(mtid):
                 result = pd.concat([result, temp_result], ignore_index=True)
             sorted_result = result.sort_values(by="Transcript id")
             st.dataframe(sorted_result)
+
+            st.subheader("\nSNP Calling data")
+            st.write("Result data for both Cultivated and Wild varieties will be downloaded in the form of HTML content. Click on the files to view data\n")
+            for tid in mtid_list:
+                try:
+                    com1,com2=st.columns(2)
+                    # Cultivated SNP Download Button
+                    with com1:
+                        #st.markdown(f"#### {tid} Cultivated SNP")
+                        html_Cultivated_page_source = automate_Cultivated_task(tid)
+                        b64_html = base64.b64encode(html_Cultivated_page_source.encode()).decode()  # Convert to base64
+                        html_href = f'<a href="data:text/html;base64,{b64_html}" download="{tid}_Cultivated_SNP.html">Download {tid} Cultivated SNP as .html</a>'
+                        st.markdown(html_href, unsafe_allow_html=True)
+                    # Wild SNP Download Button
+                    with com2:
+                        #st.markdown(f"#### {tid} Wild SNP")
+                        html_wild_page_source = automate_Wild_task(tid)
+                        b64_html2 = base64.b64encode(html_wild_page_source.encode()).decode()  # Convert to base64
+                        html_href2 = f'<a href="data:text/html;base64,{b64_html2}" download="{tid}_Wild_SNP.html">Download {tid} Wild SNP as .html</a>'
+                        st.markdown(html_href2, unsafe_allow_html=True)
+
+                except Exception as e:
+                    st.write(f"Error fetching data for Transcript ID: {tid}")
+                    st.write("Unable to fetch data from the server. Please try again later -->","https://cegresources.icrisat.org/cicerseq/?page_id=3605")
 
             st.subheader("RNA data")
             for tid in mtid_list:
@@ -398,32 +515,6 @@ def multi_transcriptid_info(mtid):
             if not result.empty:
                 sorted_result = result.sort_values(by="Target_Acc.")
                 st.dataframe(sorted_result)
-
-            st.subheader("Protein and PPI data")
-            result = pd.DataFrame()
-    
-            for tid in mtid_list:
-                protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
-                if not protein_matching_rows.empty:
-                    result = pd.concat([result, protein_matching_rows], ignore_index=True)
-                else:
-                    st.write(f"No match found for Transcript id: {tid} in protein data\n")
-            if not result.empty:
-                sorted_result = result.sort_values(by="Transcript id")
-                st.dataframe(sorted_result)
-                for tid in mtid_list:
-                    protein_matching_rows = protein_df[protein_df['Transcript id'] == tid]
-                    if not protein_matching_rows.empty:
-                        protein_transcript = protein_matching_rows['preferredName'].values[0]
-                        st.write(f"Protein Transcript for {tid}: {protein_transcript}")
-                        
-                        network_link = get_string_network_link(protein_transcript)
-                        st.write("Redirected Network URL -->", network_link)
-                        st.write("\n")
-                    else:
-                        st.write(f"No match found for Transcript id: {tid} in protein data\n")
-            else:
-                st.write("No protein data found for any of the provided Transcript IDs.\n")
             
             #Orthologous analysis
             st.subheader("Orthologs data")
@@ -444,96 +535,6 @@ def multi_transcriptid_info(mtid):
                     st.write(f"No match found for Transcript id: {tid} in Inparalogs data")
             st.write("For detailed results visit the following link -->","https://orthovenn3.bioinfotoolkits.net/result/88e9a64330ba4d64b78fc5fd9561cd64/orthologous")
 
-            st.subheader("\nSNP Calling data")
-            st.write("Result data for both Cultivated and Wild varieties will be downloaded in the form of HTML content. Click on the files to view data\n")
-            for tid in mtid_list:
-                try:
-                    com1,com2=st.columns(2)
-                    # Cultivated SNP Download Button
-                    with com1:
-                        #st.markdown(f"#### {tid} Cultivated SNP")
-                        html_Cultivated_page_source = automate_Cultivated_task(tid)
-                        b64_html = base64.b64encode(html_Cultivated_page_source.encode()).decode()  # Convert to base64
-                        html_href = f'<a href="data:text/html;base64,{b64_html}" download="{tid}_Cultivated_SNP.html">Download {tid} Cultivated SNP as .html</a>'
-                        st.markdown(html_href, unsafe_allow_html=True)
-                    # Wild SNP Download Button
-                    with com2:
-                        #st.markdown(f"#### {tid} Wild SNP")
-                        html_wild_page_source = automate_Wild_task(tid)
-                        b64_html2 = base64.b64encode(html_wild_page_source.encode()).decode()  # Convert to base64
-                        html_href2 = f'<a href="data:text/html;base64,{b64_html2}" download="{tid}_Wild_SNP.html">Download {tid} Wild SNP as .html</a>'
-                        st.markdown(html_href2, unsafe_allow_html=True)
-
-                except Exception as e:
-                    st.write(f"Error fetching data for Transcript ID: {tid}")
-                    st.write("Unable to fetch data from the server. Please try again later -->","https://cegresources.icrisat.org/cicerseq/?page_id=3605")
-
-            # Gene Ontology and KEGG data
-            st.subheader("\nGO and KEGG data")
-            GO_matching_row = GO_df[GO_df['Transcript id'].isin(mtid_list)]
-            result=pd.DataFrame()
-            for tid in mtid_list:
-                if not GO_matching_row.empty:
-                    temp_result = GO_matching_row[GO_matching_row['Transcript id'] == tid]
-                    result = pd.concat([result, temp_result], ignore_index=True)
-                else:
-                    st.write(f"No match found for Transcript ID: {tid} in GO KEGG data\n")
-            if not result.empty:
-                result = result.drop_duplicates(subset=['Transcript id'])
-                st.dataframe(result)        
-
-            st.subheader("\nCellular Localisation data")
-            result = pd.DataFrame()
-            for tid in mtid_list:
-                temp_result = cello_df[cello_df['Transcript id'] == tid]
-                if not temp_result.empty:
-                    if '#Combined:' in temp_result.columns:
-                        temp_result = temp_result.drop(columns=['#Combined:'])
-                    result = pd.concat([result, temp_result], ignore_index=True)
-                else:
-                    st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
-            if not result.empty:
-                result = result.drop_duplicates(subset=['Transcript id'])
-                st.dataframe(result)
-            else:
-                st.write("No cellular localisation data found for any of the provided Transcript IDs.\n")
-        
-            st.subheader("\nSequences data")
-            for tid in mtid_list:
-                matching_rows = df[df['Transcript id'] == tid]
-                if not matching_rows.empty:
-                    cds_code = format_sequence(matching_rows['Cds Sequence'].values[0])
-                    peptide_code = format_sequence(matching_rows['Peptide Sequence'].values[0])
-                    transcript_code = format_sequence(matching_rows['Transcript Sequence'].values[0])
-                    gene_code = format_sequence(matching_rows['Genomic Sequence'].values[0])
-                    promote_code = format_sequence(matching_rows['Promoter Sequence'].values[0])
-
-                    with st.expander(f"{tid} CDS Sequence"):
-                        st.code(cds_code, language="text")
-                    with st.expander(f"{tid} Peptide Sequence"):
-                        st.code(peptide_code, language="text")
-                    with st.expander(f"{tid} Transcript Sequence"):
-                        st.code(transcript_code, language="text")
-                    with st.expander(f"{tid} Genomic Sequence"):
-                        st.code(gene_code, language="text")
-                    with st.expander(f"{tid} Promoter Sequence"):
-                        st.code(promote_code, language="text")
-
-                    header = f">{tid}|{tid}"
-                    promote_file = f"{header}\n{promote_code}\n"
-                    
-                    # Convert to base64 for download
-                    b64 = base64.b64encode(promote_file.encode()).decode()  # Convert to base64
-                    href = f'<a href="data:text/plain;base64,{b64}" download="{tid}_promoter_sequence.txt">Download Promoter Sequence as .txt</a>'
-                    st.markdown(href, unsafe_allow_html=True)
-
-                    # Provide link for further analysis
-                    st.write(f"Paste the promoter sequence for {tid} on the following link to get promoter region analysis!")
-                    st.write("https://bioinformatics.psb.ugent.be/webtools/plantcare/html/search_CARE_onCluster.html\n")
-                    st.write("\n")
-                else:
-                    st.write(f"No matching data found for Transcript ID: {tid}\n")
-        
         else:
             st.write("Transcript ID not found\n")
     else:
