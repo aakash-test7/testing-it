@@ -556,5 +556,6 @@ def process_mlocid(mlocid):
     for locid in mlocid_list:
         transcript_id = process_locid(locid)
         if transcript_id:
-            transcript_ids.append(transcript_id)\
-    return ",".join(transcript_ids)
+            transcript_ids.append(transcript_id)
+    result=",".join(transcript_ids)
+    return result
