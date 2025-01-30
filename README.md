@@ -1,4 +1,4 @@
-![pvz](https://github.com/user-attachments/assets/452b6a29-2012-4394-9260-7f38e75c959f)# Multi-Class Classification App Architecture
+# Multi-Class Classification App Architecture
 
 ## Files
 - **app.py**
