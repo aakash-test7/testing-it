@@ -539,3 +539,20 @@ def multi_transcriptid_info(mtid):
             st.write("Transcript ID not found\n")
     else:
         st.write("...Error...\n")
+def process_locid(locid):
+    result = protein_df[protein_df['preferredName'] == locid]
+    if not result.empty:
+        return result.iloc[0]['Transcript id']
+    else:
+        return None
+def process_mlocid(mlocid):
+    mlocid_list = [item.strip() for item in mlocid.replace(",", " ").split()]
+    mlocid_list = list(set(mlocid_list))
+    locid_transcript_list = []
+    for locid in mlocid_list:
+        transcript_id = process_locid(protein_df, locid)
+        if transcript_id:
+            locid_transcript_list.append((locid, transcript_id))
+        else:
+            locid_transcript_list.append((locid, "Not found"))
+    return locid_transcript_list
