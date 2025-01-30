@@ -1,10 +1,8 @@
 import streamlit as st
 from google.cloud import storage
 from datetime import timedelta
-import os
 from google.oauth2 import service_account
 
-# Load the service account key from Streamlit Secrets
 secrets = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(secrets)
 
@@ -15,12 +13,10 @@ def generate_signed_url(blob_name):
         client = storage.Client(credentials=credentials)
         bucket = client.get_bucket(bucket_name)
         blob = bucket.blob(blob_name)
-        
         # Check if the blob exists
         if not blob.exists():
             print(f"File {blob_name} does not exist in bucket {bucket_name}")  # Debugging
             return None
-        
         # Generate a signed URL that expires in 1 hour
         url = blob.generate_signed_url(expiration=timedelta(hours=1), method='GET')
         print(f"Generated signed URL for {blob_name}: {url}")  # Debugging
@@ -56,13 +52,19 @@ elif selected_page == "Start Task":
 
     with col1:
         tid = st.text_input("Enter the Transcript ID: ", placeholder="e.g., Ca_00001", key="Tid_input1").strip()
-
-    with col2:
         mtid = st.text_input("Enter multiple Transcript IDs: ", placeholder="e.g., Ca_00001, Ca_00002", key="mTid_input2").strip()
         if mtid:
             mtid_list = [item.strip() for item in mtid.replace(",", " ").split()]
             mtid_list = list(set(mtid_list))
             mtid = ",".join(mtid_list)
+
+    with col2:
+        locid = st.text_input("Enter the LOC ID: ", placeholder="e.g., LOC101511858", key="Locid_input1").strip()
+        mlocid = st.text_input("Enter multiple LOC IDs: ", placeholder="e.g., LOC101511858, LOC101496413", key="mLocid_input2").strip()
+        if mlocid:
+            mlocid_list = [item.strip() for item in mlocid.replace(",", " ").split()]
+            mlocid_list = list(set(mlocid_list))
+            mlocid = ",".join(mlocid_list)
 
     if st.button("Start"):
         if tid:
@@ -71,6 +73,16 @@ elif selected_page == "Start Task":
             st.toast("Task completed successfully.")
         elif mtid:
             result =multi_user_input_menu(mtid)
+            st.write(result)
+            st.toast("Task completed successfully.")
+        elif locid:
+            tid=process_locid(locid)
+            result = user_input_menu(tid)
+            st.write(result)
+            st.toast("Task completed successfully.")
+        elif mlocid:
+            mtid=process_mlocid(mlocid)
+            result = multi_user_input_menu(mtid)
             st.write(result)
             st.toast("Task completed successfully.")
         else:
