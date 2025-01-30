@@ -31,16 +31,8 @@ st.set_page_config(page_title="MultiClassClassificationInput App", layout="wide"
 
 # --- Sidebar Navigation ---
 st.sidebar.title("Navigation")
-pages = {"Home": generate_signed_url("Icons/home.svg"),"Start Task": generate_signed_url("Icons/start_task.svg"),"Meta Data": generate_signed_url("Icons/meta_data.svg"),"Glossary": generate_signed_url("Icons/glossary.svg"),"Demonstration": generate_signed_url("Icons/demonstration.svg"),"About": generate_signed_url("Icons/about.svg")}
-for page, icon_path in pages.items():
-    col1, col2 = st.sidebar.columns([1, 5])
-    with col1:
-        st.image(icon_path, width=40)
-    with col2:
-        if st.button(page,use_container_width=True):
-            selected_page = page
-if 'selected_page' not in locals():
-    selected_page = "Home"
+pages = ["Home", "Start Task","Meta Data", "Glossary","Demonstration", "About"]
+selected_page = st.sidebar.selectbox("Select Page :", pages)
 
 # --- Home Page ---
 if selected_page == "Home":
