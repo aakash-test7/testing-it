@@ -1,4 +1,4 @@
-# Multi-Class Classification App Architecture
+![pvz](https://github.com/user-attachments/assets/452b6a29-2012-4394-9260-7f38e75c959f)# Multi-Class Classification App Architecture
 
 ## Files
 - **app.py**
@@ -51,7 +51,11 @@
   - Handles user input for multiple transcript IDs.
 - **multi_transcriptid_info(mtid)**
   - Displays information for multiple transcript IDs.
-
+- **process_locid(locid)**
+  - Maps given NCBI ID with Gene ID  
+- **process_mlocid(mlocid)**    
+  - Maps multiple NCBI IDs with Gene IDs
+    
 ## Requirements (requirements.txt)
 - **pandas**
 - **numpy**
@@ -105,7 +109,7 @@
 
 ## Google Cloud Storage (GCS)
 - **Bucket Name**: `chickpea-transcriptome`
-- **Files Stored**:
+- **Data Files Stored**:
   - FPKM_Matrix(Ca).xlsx
   - miRNA data (8.xlsx)
   - Protein data (9.xlsx)
@@ -114,3 +118,7 @@
   - Cellular localization data (13.xlsx)
   - Orthologs data (14.txt)
   - Paralogs data (15.txt)
+- **Icons SVG Stored**
+- **Images Stored**
+- **Video Tutorials Stored**
+   
