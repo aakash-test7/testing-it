@@ -233,7 +233,7 @@ def transcriptid_info(tid):
                 st.write("Redirected Network URL -->", network_link)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in protein data\n")
+                st.write(f"No match found for Gene id: {tid} in protein data\n")
             
             st.subheader("Cellular Localisation data")
             cello_matching_row = cello_df[cello_df['Transcript id'] == tid]
@@ -243,7 +243,7 @@ def transcriptid_info(tid):
                 st.dataframe(cello_matching_row)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
+                st.write(f"No match found for Gene id: {tid} in Cellular Protein Localisation data\n")
 
             st.subheader("GO and KEGG data")
             GO_matching_row = GO_df[GO_df['Transcript id'] == tid]
@@ -251,7 +251,7 @@ def transcriptid_info(tid):
                 st.dataframe(GO_matching_row)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in GO KEGG data\n")
+                st.write(f"No match found for Gene id: {tid} in GO KEGG data\n")
 
             temp_df = df.copy()
             st.subheader("FPKM Matrix Atlas data")
@@ -297,7 +297,7 @@ def transcriptid_info(tid):
                 st.dataframe(miRNA_matching_rows)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in miRNA data\n")
+                st.write(f"No match found for Gene id: {tid} in miRNA data\n")
 
             #Orthologous analysis
             st.subheader("Orthologs data")
@@ -306,18 +306,18 @@ def transcriptid_info(tid):
                 st.dataframe(ortho_df)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in Orthologs data\n")
+                st.write(f"No match found for Gene id: {tid} in Orthologs data\n")
             st.subheader("Inparalogs data")
             para_df = filter_paralogs(tid)
             if not para_df.empty:
                 st.dataframe(para_df)
                 st.write("\n")
             else:
-                st.write(f"No match found for Transcript id: {tid} in Inparalogs data\n")
+                st.write(f"No match found for Gene id: {tid} in Inparalogs data\n")
             st.write("For detailed results visit the following link -->","https://orthovenn3.bioinfotoolkits.net/result/88e9a64330ba4d64b78fc5fd9561cd64/orthologous\n")
             
         else:
-            st.write("Transcript ID not found\n")
+            st.write("Gene ID not found\n")
     else:
         st.write("...Error...\n")
 
@@ -389,7 +389,7 @@ def multi_transcriptid_info(mtid):
                     st.write("https://bioinformatics.psb.ugent.be/webtools/plantcare/html/search_CARE_onCluster.html\n")
                     st.write("\n")
                 else:
-                    st.write(f"No matching data found for Transcript ID: {tid}\n")
+                    st.write(f"No matching data found for Gene ID: {tid}\n")
 
             st.subheader("Protein and PPI data")
             result = pd.DataFrame()
@@ -399,7 +399,7 @@ def multi_transcriptid_info(mtid):
                 if not protein_matching_rows.empty:
                     result = pd.concat([result, protein_matching_rows], ignore_index=True)
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in protein data\n")
+                    st.write(f"No match found for Gene id: {tid} in protein data\n")
             if not result.empty:
                 sorted_result = result.sort_values(by="Transcript id")
                 st.dataframe(sorted_result)
@@ -413,9 +413,9 @@ def multi_transcriptid_info(mtid):
                         st.write("Redirected Network URL -->", network_link)
                         st.write("\n")
                     else:
-                        st.write(f"No match found for Transcript id: {tid} in protein data\n")
+                        st.write(f"No match found for Gene id: {tid} in protein data\n")
             else:
-                st.write("No protein data found for any of the provided Transcript IDs.\n")
+                st.write("No protein data found for any of the provided Gene IDs.\n")
 
             st.subheader("\nCellular Localisation data")
             result = pd.DataFrame()
@@ -426,12 +426,12 @@ def multi_transcriptid_info(mtid):
                         temp_result = temp_result.drop(columns=['#Combined:'])
                     result = pd.concat([result, temp_result], ignore_index=True)
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in Cellular Protein Localisation data\n")
+                    st.write(f"No match found for Gene id: {tid} in Cellular Protein Localisation data\n")
             if not result.empty:
                 result = result.drop_duplicates(subset=['Transcript id'])
                 st.dataframe(result)
             else:
-                st.write("No cellular localisation data found for any of the provided Transcript IDs.\n")
+                st.write("No cellular localisation data found for any of the provided Gene IDs.\n")
 
             # Gene Ontology and KEGG data
             st.subheader("\nGO and KEGG data")
@@ -442,7 +442,7 @@ def multi_transcriptid_info(mtid):
                     temp_result = GO_matching_row[GO_matching_row['Transcript id'] == tid]
                     result = pd.concat([result, temp_result], ignore_index=True)
                 else:
-                    st.write(f"No match found for Transcript ID: {tid} in GO KEGG data\n")
+                    st.write(f"No match found for Gene ID: {tid} in GO KEGG data\n")
             if not result.empty:
                 result = result.drop_duplicates(subset=['Transcript id'])
                 st.dataframe(result)        
@@ -478,7 +478,7 @@ def multi_transcriptid_info(mtid):
                         st.markdown(html_href2, unsafe_allow_html=True)
 
                 except Exception as e:
-                    st.write(f"Error fetching data for Transcript ID: {tid}")
+                    st.write(f"Error fetching data for Gene ID: {tid}")
                     st.write("Unable to fetch data from the server. Please try again later -->","https://cegresources.icrisat.org/cicerseq/?page_id=3605")
 
             st.subheader("RNA data")
@@ -490,7 +490,7 @@ def multi_transcriptid_info(mtid):
                     else:
                         st.write(f"{tid} mRNA absent : No ( 0 )\n")
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in RNA data\n")
+                    st.write(f"No match found for Gene id: {tid} in RNA data\n")
             
             st.subheader("lncRNA data")
             for tid in mtid_list:
@@ -501,7 +501,7 @@ def multi_transcriptid_info(mtid):
                     else:
                         st.write(f"{tid} lncRNAs absent : No ( 0 )\n")
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in lncRNA data\n")
+                    st.write(f"No match found for Gene id: {tid} in lncRNA data\n")
 
             st.subheader("miRNA data")
             miRNA_matching_rows = miRNA_df[miRNA_df['Target_Acc.'].isin(mtid_list)]
@@ -511,7 +511,7 @@ def multi_transcriptid_info(mtid):
                     temp_result = miRNA_matching_rows[miRNA_matching_rows['Target_Acc.'] == tid]
                     result = pd.concat([result, temp_result], ignore_index=True)
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in miRNA data\n")
+                    st.write(f"No match found for Gene id: {tid} in miRNA data\n")
             if not result.empty:
                 sorted_result = result.sort_values(by="Target_Acc.")
                 st.dataframe(sorted_result)
@@ -524,7 +524,7 @@ def multi_transcriptid_info(mtid):
                     st.write(tid)
                     st.dataframe(ortho_df)
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in Orthologs data")
+                    st.write(f"No match found for Gene id: {tid} in Orthologs data")
             st.subheader("\nInparalogs data")
             for tid in mtid_list:
                 para_df = filter_paralogs(tid)
@@ -532,11 +532,11 @@ def multi_transcriptid_info(mtid):
                     st.write(tid)
                     st.dataframe(para_df)
                 else:
-                    st.write(f"No match found for Transcript id: {tid} in Inparalogs data")
+                    st.write(f"No match found for Gene id: {tid} in Inparalogs data")
             st.write("For detailed results visit the following link -->","https://orthovenn3.bioinfotoolkits.net/result/88e9a64330ba4d64b78fc5fd9561cd64/orthologous")
 
         else:
-            st.write("Transcript ID not found\n")
+            st.write("Gene ID not found\n")
     else:
         st.write("...Error...\n")
 
@@ -544,7 +544,7 @@ def process_locid(locid):
     result = protein_df[protein_df['preferredName'] == locid]
     if not result.empty:
         result = result.iloc[0]['Transcript id']
-        st.write(f"Transcript ID for {locid} is {result}")
+        st.write(f"Gene ID for {locid} is {result}")
         return result
     else:
         return None
