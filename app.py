@@ -59,8 +59,8 @@ elif selected_page == "Start Task":
             mtid = ",".join(mtid_list)
 
     with col2:
-        locid = st.text_input("Enter the LOC ID: ", placeholder="e.g., LOC101511858", key="Locid_input1").strip()
-        mlocid = st.text_input("Enter multiple LOC IDs: ", placeholder="e.g., LOC101511858, LOC101496413", key="mLocid_input2").strip()
+        locid = st.text_input("Enter the NCBI ID: ", placeholder="e.g., LOC101511858", key="Locid_input1").strip()
+        mlocid = st.text_input("Enter multiple NCBI IDs: ", placeholder="e.g., LOC101511858, LOC101496413", key="mLocid_input2").strip()
         if mlocid:
             mlocid_list = [item.strip() for item in mlocid.replace(",", " ").split()]
             mlocid_list = list(set(mlocid_list))
@@ -86,9 +86,9 @@ elif selected_page == "Start Task":
             st.write(result)
             st.toast("Task completed successfully.")
         else:
-            st.warning("Need either a Transcript ID or multiple IDs to proceed.")
+            st.warning("Need either a Transcript ID or NCBI ID to proceed.")
     elif tid == "":
-        st.warning("Need Transcript ID to proceed.")
+        st.warning("Need Transcript ID/ NCBI ID to proceed.")
     else:
         st.write("Press the 'Start' button to begin the task.")
         st.write("Follow the instructions or check out demonstrations")
