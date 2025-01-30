@@ -28,7 +28,7 @@ def generate_signed_url(blob_name):
 # --- Page Configurations ---
 st.set_page_config(page_title="MultiClassClassificationInput App", layout="wide")
 
-from backend import user_input_menu, multi_user_input_menu
+from backend import user_input_menu, multi_user_input_menu, process_locid, process_mlocid
 
 # --- Sidebar Navigation ---
 st.sidebar.title("Navigation")
