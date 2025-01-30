@@ -51,8 +51,8 @@ elif selected_page == "Start Task":
     col1,col2 = st.columns(2)
 
     with col1:
-        tid = st.text_input("Enter the Transcript ID: ", placeholder="e.g., Ca_00001", key="Tid_input1").strip()
-        mtid = st.text_input("Enter multiple Transcript IDs: ", placeholder="e.g., Ca_00001, Ca_00002", key="mTid_input2").strip()
+        tid = st.text_input("Enter the Gene ID: ", placeholder="e.g., Ca_00001", key="Tid_input1").strip()
+        mtid = st.text_input("Enter multiple Gene IDs: ", placeholder="e.g., Ca_00001, Ca_00002", key="mTid_input2").strip()
         if mtid:
             mtid_list = [item.strip() for item in mtid.replace(",", " ").split()]
             mtid_list = list(set(mtid_list))
@@ -86,9 +86,9 @@ elif selected_page == "Start Task":
             st.write(result)
             st.toast("Task completed successfully.")
         else:
-            st.warning("Need either a Transcript ID or NCBI ID to proceed.")
+            st.warning("Need either a Gene ID or NCBI ID to proceed.")
     elif tid == "":
-        st.warning("Need Transcript ID/ NCBI ID to proceed.")
+        st.warning("Need Gene ID/ NCBI ID to proceed.")
     else:
         st.write("Press the 'Start' button to begin the task.")
         st.write("Follow the instructions or check out demonstrations")
