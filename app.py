@@ -2,10 +2,10 @@ import streamlit as st
 from google.cloud import storage
 from datetime import timedelta
 from google.oauth2 import service_account
+from backend import user_input_menu, multi_user_input_menu, process_locid, process_mlocid
 
 secrets = st.secrets["gcp_service_account"]
 credentials = service_account.Credentials.from_service_account_info(secrets)
-
 def generate_signed_url(blob_name):
     """Generates a signed URL to access a file in GCS."""
     try:
@@ -26,14 +26,21 @@ def generate_signed_url(blob_name):
         return None
 
 # --- Page Configurations ---
+st.logo(generate_signed_url("pvz.gif"),size="large")
 st.set_page_config(page_title="MultiClassClassificationInput App", layout="wide")
-
-from backend import user_input_menu, multi_user_input_menu, process_locid, process_mlocid
 
 # --- Sidebar Navigation ---
 st.sidebar.title("Navigation")
-pages = ["Home", "Start Task","Meta Data", "Glossary","Demonstration", "About"]
-selected_page = st.sidebar.selectbox("Select Page :", pages)
+pages = {"Home": generate_signed_url("Icons/home.svg"),"Start Task": generate_signed_url("Icons/start_task.svg"),"Meta Data": generate_signed_url("Icons/meta_data.svg"),"Glossary": generate_signed_url("Icons/glossary.svg"),"Demonstration": generate_signed_url("Icons/demonstration.svg"),"About": generate_signed_url("Icons/about.svg")}
+for page, icon_path in pages.items():
+    col1, col2 = st.sidebar.columns([1, 5])
+    with col1:
+        st.image(icon_path, width=40)
+    with col2:
+        if st.button(page,use_container_width=True):
+            selected_page = page
+if 'selected_page' not in locals():
+    selected_page = "Home"
 
 # --- Home Page ---
 if selected_page == "Home":
